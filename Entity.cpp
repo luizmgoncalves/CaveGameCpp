@@ -8,10 +8,10 @@
 
 void Entity::init(int w, int h, sf::Texture* text) {
     this->shape.setTexture(*text, true);
-    this->dim = { w, h };
+    this->dim = sf::Vector2f( w, h );
 
 
-    this->shape.setScale({ w / text->getSize().x, h / text->getSize().y });
+    this->shape.setScale(sf::Vector2f( w / text->getSize().x, h / text->getSize().y ));
 
     this->gravity = 1000;
 
@@ -213,7 +213,7 @@ void DropItem::update_vel_x(float interval) {
     this->vel.x *= 0.8;
 }
 
-void DropItem::update_vel_x(float interval) {
+void DropItem::update_vel_y(float interval) {
     this->vel.y += this->gravity * interval;
 }
 

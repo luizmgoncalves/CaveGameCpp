@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "perlin.h"
+#include "Perlin.h"
 
 #define B SAMPLE_SIZE
 #define BM (SAMPLE_SIZE-1)

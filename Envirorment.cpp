@@ -1,8 +1,10 @@
-#include "Envirorment.h" 
-
 #include <SFML/Graphics.hpp>
 
 #include <vector>
+
+#include "Perlin.h"
+
+#include "Envirorment.h" 
 
 namespace env {
     std::vector<sf::Texture>* Textures::textures;
@@ -46,6 +48,8 @@ namespace env {
 
 
     std::unordered_map<size_t, struct v_blocks*> EnvirormentGenerator::all_blocks = {};
+
+    Perlin* EnvirormentGenerator::noise = 0;
 
 
     EnvirormentGenerator::EnvirormentGenerator() {

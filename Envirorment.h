@@ -65,7 +65,7 @@ namespace env {
     public:
         static std::unordered_map<size_t, struct v_blocks*> all_blocks;
 
-        static Perlin* noise;
+         static Perlin *  noise;
 
         EnvirormentGenerator();
 

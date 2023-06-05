@@ -2,13 +2,18 @@
 #include <iostream>
 #include<cstdlib>
 #include <list>
-#include <Entity.h>
-#include <Envirorment.h>
+
+#include "Envirorment.h"
+
+#include "Entity.h"
+
 
 using namespace std;
 
 #define SCREEN_HEIGHT 600
 #define SCREEN_WIDTH 800
+
+sf::Font FONTE;
 
 
 class Inventory {
@@ -27,12 +32,12 @@ public:
 
         this->arrow = sf::Sprite();
 
-        this->arrow.setPosition({ SCREEN_WIDTH, SCREEN_HEIGHT } / 2.f + {-this->arrowt.getSize().x / 2.f, 300});
+        this->arrow.setPosition( sf::Vector2f(SCREEN_WIDTH, SCREEN_HEIGHT) / 2.f + sf::Vector2f( - (int)this->arrowt.getSize().x / 2.f, 300 ));
 
         this->arrow.setTexture(this->arrowt);
 
-        this->item = env::Textures.textures->at(curr_item);
-        this->item.setPosition(this->arrow.getPosition() + {this->arrowt.getSize().x, 0});
+        this->item.setTexture(env::Textures::textures->at(curr_item), false);
+        this->item.setPosition(this->arrow.getPosition() + sf::Vector2f(this->arrowt.getSize().x, 0));
 
     }
 
@@ -69,8 +74,6 @@ public:
     void render_all(sf::RenderWindow, float);
 };
 
-sf::Font FONTE;
-
 int main()
 {
     FONTE.loadFromFile("arial.ttf");
@@ -95,7 +98,7 @@ int main()
 
 
 
-        ball.update_pos(paddles);
+        //ball.update_pos(paddles);
 
         // draw the objects
         window.clear();
