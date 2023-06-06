@@ -63,30 +63,48 @@ public:
 
     std::vector<env::Chunk*> chunks_around;
     std::vector<Entity*> entities;
-    Player player;
+    Player * player;
     sf::Vector2f presenting_pos_offset;
     sf::Vector2f window_center;
 
-    ElementsManager();
-    ~ElementsManager();
-    void chunk_gen();
-    void chunk_loading();
-    void render_all(sf::RenderWindow, float);
+    //Inventory inventory;
+
+    ElementsManager() {
+        this->player = new Player();
+    }
+    //~ElementsManager();
+    //void chunk_gen();
+    //void chunk_loading();
+    void render_all(sf::RenderWindow * window, float interval) {
+        this->player->update_vel(interval);
+
+        window->draw(this->player->shape);
+    }
 };
 
 int main()
 {
+
+    env::Textures();
+
     FONTE.loadFromFile("arial.ttf");
-    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Pong");
+    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Cave Game");
 
     window.setFramerateLimit(45);
 
 
     sf::Clock clock;
+    sf::Text fps;
+    fps.setFont(FONTE);
+    fps.setCharacterSize(20);
+
+
+    ElementsManager el_mngr = ElementsManager();
 
     while (window.isOpen())
     {
         sf::Time elapsed = clock.restart();
+        fps.setString("fps: " + to_string(1.f / elapsed.asSeconds()));
 
 
         sf::Event event;
@@ -103,8 +121,9 @@ int main()
         // draw the objects
         window.clear();
 
+        window.draw(fps);
 
-
+        el_mngr.render_all(&window, elapsed.asSeconds());
         window.display();
 
     }

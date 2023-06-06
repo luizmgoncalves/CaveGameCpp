@@ -60,7 +60,7 @@ public:
 class Player : public Entity {
 public:
 
-    std::unordered_map<std::string, std::vector<sf::Texture>*> textures;
+    std::unordered_map<std::string, std::vector<sf::Texture *>*> textures;
 
 
     Player();

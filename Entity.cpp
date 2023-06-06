@@ -8,13 +8,12 @@
 
 void Entity::init(int w, int h, sf::Texture* text) {
     this->shape.setTexture(*text, true);
+
+
     this->dim = sf::Vector2f( w, h );
 
-
     this->shape.setScale(sf::Vector2f( w / text->getSize().x, h / text->getSize().y ));
-
     this->gravity = 1000;
-
     def_max_vel();
 }
 
@@ -78,37 +77,38 @@ void Entity::collision_algorithm(std::vector<sf::FloatRect>* blocks, float inter
 
 
 Player::Player() {
-
     std::unordered_map<std::string, std::vector<std::string>> image_types = {
         {"stopped", {"p1", "p2", "p3"}},
         {"walking", {"r1", "r2", "r3", "r4", "r5", "r6"}},
         {"running", {"rr1", "rr2", "rr3", "rr4", "rr5", "rr6"}},
         {"jumping", {"j1", "j2"}}
     };
-
     for (auto it = image_types.begin(); it != image_types.end(); it++) {
         std::string key = (*it).first;
 
-        this->textures[key + "r"] = new std::vector<sf::Texture>((*it).second.size());//right textures
-        this->textures[key + "l"] = new std::vector<sf::Texture>((*it).second.size()); //left texture
+        this->textures[key + "r"] = new std::vector<sf::Texture *>();//right textures
+        this->textures[key + "l"] = new std::vector<sf::Texture *>(); //left texture
 
         for (std::string path : image_types[key]) {
             sf::Image im;
-            sf::Texture tex;
+            sf::Texture * texr, * texl;
 
-            im.loadFromFile(path + ".png");
-            tex.loadFromImage(im);
+            texr = new sf::Texture();
+            texl = new sf::Texture();
 
-            this->textures[key + "r"]->push_back(tex);
+            im.loadFromFile("game_images/" + path + ".png");
+            texr->loadFromImage(im);
+            this->textures[key + "r"]->push_back(texr);
 
             im.flipHorizontally();
-            tex.loadFromImage(im);
+            texl->loadFromImage(im);
 
-            this->textures[key + "l"]->push_back(tex);
+
+            this->textures[key + "l"]->push_back(texl);
         }
     }
 
-    this->init(PLAYER_DIM, &this->textures.at("stoppedr")->at(0));
+    this->init(PLAYER_DIM, this->textures.at("stoppedr")->at(0));
 }
 
 
@@ -122,30 +122,30 @@ void Player::collided_down() {
 void Player::update_state() {
     if (this->current_state.left) {
         if (this->current_state.walking) {
-            this->shape.setTexture(this->textures.at("walkingl")->at(0), true);
+            this->shape.setTexture(*this->textures.at("walkingl")->at(0), true);
         }
         else if (this->current_state.running) {
-            this->shape.setTexture(this->textures.at("runningl")->at(0), true);
+            this->shape.setTexture(*this->textures.at("runningl")->at(0), true);
         }
         else if (this->current_state.jumping) {
-            this->shape.setTexture(this->textures.at("jumpingl")->at(0), true);
+            this->shape.setTexture(*this->textures.at("jumpingl")->at(0), true);
         }
         else {
-            this->shape.setTexture(this->textures.at("stoppedl")->at(0), true);
+            this->shape.setTexture(*this->textures.at("stoppedl")->at(0), true);
         }
     }
     else if (this->current_state.right) {
         if (this->current_state.walking) {
-            this->shape.setTexture(this->textures.at("walkingr")->at(0), true);
+            this->shape.setTexture(*this->textures.at("walkingr")->at(0), true);
         }
         else if (this->current_state.running) {
-            this->shape.setTexture(this->textures.at("runningr")->at(0), true);
+            this->shape.setTexture(*this->textures.at("runningr")->at(0), true);
         }
         else if (this->current_state.jumping) {
-            this->shape.setTexture(this->textures.at("jumpingr")->at(0), true);
+            this->shape.setTexture(*this->textures.at("jumpingr")->at(0), true);
         }
         else {
-            this->shape.setTexture(this->textures.at("stoppedr")->at(0), true);
+            this->shape.setTexture(*this->textures.at("stoppedr")->at(0), true);
         }
     }
 }
