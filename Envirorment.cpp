@@ -31,7 +31,14 @@ namespace env {
 
         this->pos = pos;
 
-        this->block.setTexture(Textures::textures->at(type), true);
+        if (type) {
+            this->block.setTexture(Textures::textures->at(type), false);
+
+            this->block.setScale(sf::Vector2f(BLOCK_X / (float)Textures::textures->at(type).getSize().x, BLOCK_Y / (float)Textures::textures->at(type).getSize().y));
+        }
+
+        this->block.setPosition(pos);
+
         this->type = (Textures::block_types)type;
 
         this->owner = chunk;
@@ -72,26 +79,24 @@ namespace env {
 
         struct v_blocks* new_blocks = new struct v_blocks;
 
-
         for (int i = 0; i < CHUNK_DIM_LINES; i++) {
             for (int j = 0; j < CHUNK_DIM_COLUMNS; j++) {
                 int type = Textures::AIR;
 
-                float y = pos_a.y * CHUNK_DIM_LINES * BLOCK_Y + i * BLOCK_Y,
-                    x = pos_a.x * CHUNK_DIM_COLUMNS * BLOCK_X + j * BLOCK_X;
+                float y = pos_a.y * CHUNK_DIM_LINES  + i ,
+                    x = pos_a.x * CHUNK_DIM_COLUMNS  + j;
 
-                float y_i = EnvirormentGenerator::noise->Get(x, 0.f) * 100.f; //0 a 100
+                float y_i = EnvirormentGenerator::noise->Get(x/100.f, 0.f) * 100.f + 3; //0 a 100
 
-                float index = abs(EnvirormentGenerator::noise->Get(x, y)); //0 a 1
+                float index = abs(EnvirormentGenerator::noise->Get(x/100.f, y/100.f)); //0 a 1
 
-                if (y == y_i) {
+                std::cout << "y_i: " << (int)y_i  << " y: " << y << std::endl;
+
+                if (y == (int)y_i) {
                     type = Textures::GRASS;
                 }
                 else if (y > y_i) {
-                    if (index < 0.004) {
-                        type = Textures::AIR;
-                    }
-                    else if (index < 0.010) {
+                    if (index < 0.30) {
                         type = Textures::DIRT;
                     }
                     else {
@@ -105,24 +110,28 @@ namespace env {
             }
         }
 
-
-        EnvirormentGenerator::all_blocks.at(pos.hashable) = new_blocks;
+        EnvirormentGenerator::all_blocks[pos.hashable] = new_blocks;
         // adding generated v_blocks to all map
 
         new_blocks->tottaly_generated = true;
+
 
         return new_blocks;
     }
 
     Chunk::Chunk(sf::Vector2i pos) {
+        
         this->universal_pos = pos;
 
         this->dim = { CHUNK_DIM_COLUMNS * BLOCK_X, CHUNK_DIM_LINES * BLOCK_Y };
 
         this->pos = { this->universal_pos.x * this->dim.x, this->universal_pos.y * this->dim.y };
+        
 
         this->v_blocks = EnvirormentGenerator::gen(pos);
+        
         this->virtual_to_real_blocks();
+        
     }
 
     Chunk::~Chunk() {

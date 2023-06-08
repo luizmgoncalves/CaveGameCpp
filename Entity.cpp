@@ -73,6 +73,8 @@ void Entity::collision_algorithm(std::vector<sf::FloatRect>* blocks, float inter
     }
 
     this->pos = { new_rect.left, new_rect.top };
+
+    delete blocks;
 }
 
 

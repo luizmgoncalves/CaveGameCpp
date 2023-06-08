@@ -2,6 +2,7 @@
 #include <iostream>
 #include<cstdlib>
 #include <list>
+#include <unordered_map>
 
 #include "Envirorment.h"
 
@@ -25,7 +26,7 @@ public:
 
     Inventory() {
         for (int i = 1; i < env::Textures::LAST; i++) {
-            items.at(i) = 0;
+            items[i] = 0;
         }
 
         this->arrowt.loadFromFile("game_images/arrow.png");
@@ -38,7 +39,6 @@ public:
 
         this->item.setTexture(env::Textures::textures->at(curr_item), false);
         this->item.setPosition(this->arrow.getPosition() + sf::Vector2f(this->arrowt.getSize().x, 0));
-
     }
 
     void draw(sf::RenderWindow* window) {
@@ -61,22 +61,49 @@ public:
         sf::Vector2f pos;
     } breaking_h;
 
-    std::vector<env::Chunk*> chunks_around;
+    std::vector < std::vector<env::Chunk*> > chunks_around;
     std::vector<Entity*> entities;
     Player * player;
     sf::Vector2f presenting_pos_offset;
     sf::Vector2f window_center;
 
-    //Inventory inventory;
+    sf::Vector2i current_u_pos;
+
+    Inventory inventory;
 
     ElementsManager() {
         this->player = new Player();
+
+        this->chunk_gen();
+
     }
     //~ElementsManager();
-    //void chunk_gen();
+    void chunk_gen() {
+        this->chunks_around = vector < vector<env::Chunk*> >(3);
+        for (int i = 0; i < 3; i++) {
+            this->chunks_around[i].resize(3); //three columns by three lines
+            for (int j = 0; j < 3; j++) {
+                sf::Vector2i offset = {i-1, j-1};
+
+                chunks_around[i][j] = new env::Chunk(current_u_pos + offset);
+            }
+            
+        }
+    }
+
     //void chunk_loading();
+
     void render_all(sf::RenderWindow * window, float interval) {
         this->player->update_vel(interval);
+
+        for (vector<env::Chunk*> chunks_line : this->chunks_around) {
+            for (env::Chunk* chunk : chunks_line) {
+                for (env::Block* block : chunk->blocks) {
+                    if(block->type)
+                        window->draw(block->block);
+                }
+            }
+        }
 
         window->draw(this->player->shape);
     }
@@ -86,6 +113,7 @@ int main()
 {
 
     env::Textures();
+    env::EnvirormentGenerator();
 
     FONTE.loadFromFile("arial.ttf");
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Cave Game");
