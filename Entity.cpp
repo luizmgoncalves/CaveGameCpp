@@ -178,7 +178,7 @@ void Player::update_vel_y(float interval) {
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
-        this->pos.y = -1000;
+        this->pos.y = -100;
     }
 }
 

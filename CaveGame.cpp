@@ -11,8 +11,8 @@
 
 using namespace std;
 
-#define SCREEN_HEIGHT 600
-#define SCREEN_WIDTH 1000
+#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 1200
 
 #define WINDOW_DIM SCREEN_WIDTH, SCREEN_HEIGHT
 
@@ -85,7 +85,9 @@ public:
     }
     //~ElementsManager();
 
-    vector<sf::FloatRect> * get_five_around(sf::Vector2f pos, sf::RenderWindow * window) {
+    vector<sf::FloatRect>* get_five_around(sf::Vector2f pos) {
+        pos -= sf::Vector2f(BLOCK_X, BLOCK_Y) * 1.9f;
+
         int x, y, xc, yc, lin, col;
 
         x = pos.x - (int)pos.x % BLOCK_X;
@@ -95,10 +97,6 @@ public:
         y = pos.y - (int)pos.y % BLOCK_Y;
         if (pos.y < 0)
             y -= BLOCK_Y;
-
-        this->shower.setSize(sf::Vector2f(BLOCK_DIM));
-
-        this->shower.setPosition(sf::Vector2f(x, y) - this->presenting_pos_offset);
 
         
         xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X) ;
@@ -111,6 +109,63 @@ public:
         if (y < 0 && y % (CHUNK_DIM_LINES * BLOCK_Y))
             yc -= 1;
         lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y))/ (float)BLOCK_Y;
+
+        int colc = xc - this->chunks_around[0][0]->universal_pos.x,
+            linc = yc - this->chunks_around[0][0]->universal_pos.y;
+
+
+        int loffset, coloffset, l=lin, c;
+
+        vector<sf::FloatRect>* collide_blocks = new vector<sf::FloatRect>();
+
+        for (int i = 0; i < 5; i++) {
+            c = col;
+            for (int j = 0; j < 5; j++) {
+                loffset = l / CHUNK_DIM_LINES;
+                coloffset = c / CHUNK_DIM_COLUMNS;
+
+                if (!(abs(linc + loffset) > 2 || abs(colc + coloffset) > 2 || linc + loffset < 0 || colc + coloffset < 0)) {
+
+                    env::Block * block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 0];
+
+                    if (block->type >= env::Textures::GRASS) {
+                        collide_blocks->push_back(sf::FloatRect(block->pos, sf::Vector2f(BLOCK_DIM)));
+                    }
+
+                    
+                }
+
+                c++;
+            }
+            l++;
+        }
+
+        return collide_blocks;
+
+    }
+
+    bool break_block(sf::Vector2f pos, sf::RenderWindow* window) {
+        int x, y, xc, yc, lin, col;
+
+        x = pos.x - (int)pos.x % BLOCK_X;
+        if (pos.x < 0)
+            x -= BLOCK_X;
+
+        y = pos.y - (int)pos.y % BLOCK_Y;
+        if (pos.y < 0)
+            y -= BLOCK_Y;
+
+
+        xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X);
+        if (pos.x < 0 && x % (CHUNK_DIM_COLUMNS * BLOCK_X))
+            xc -= 1;
+        col = (x - xc * (CHUNK_DIM_COLUMNS * BLOCK_X)) / (float)BLOCK_X;
+
+
+        yc = y / (CHUNK_DIM_LINES * BLOCK_Y);
+        if (y < 0 && y % (CHUNK_DIM_LINES * BLOCK_Y))
+            yc -= 1;
+        lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y)) / (float)BLOCK_Y;
 
         int linc = xc - this->chunks_around[0][0]->universal_pos.x,
             colc = yc - this->chunks_around[0][0]->universal_pos.y;
@@ -140,7 +195,7 @@ public:
         for (int i = 0; i < 3; i++) {
             this->chunks_around[i].resize(3); //three columns by three lines
             for (int j = 0; j < 3; j++) {
-                sf::Vector2i offset = {i-1, j-1};
+                sf::Vector2i offset = {j-1, i - 1 };
 
                 chunks_around[i][j] = new env::Chunk(current_u_pos + offset);
             }
@@ -154,6 +209,8 @@ public:
         this->player->update_vel(interval);
 
         this->presenting_pos_offset = this->player->pos - sf::Vector2f(WINDOW_DIM) / 2.f;
+
+        this->player->collision_algorithm(this->get_five_around(this->player->pos), interval);
 
         for (vector<env::Chunk*> chunks_line : this->chunks_around) {
             for (env::Chunk* chunk : chunks_line) {
@@ -211,7 +268,7 @@ int main()
                     wx = event.mouseButton.x / (float)window.getSize().x * SCREEN_WIDTH, 
                     wy = event.mouseButton.y / (float)window.getSize().y * SCREEN_HEIGHT;
 
-                el_mngr.get_five_around(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
+                //el_mngr.break_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
             }
         }
 

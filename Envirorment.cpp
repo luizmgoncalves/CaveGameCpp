@@ -47,6 +47,12 @@ namespace env {
     void Block::change_type(int type) {
         this->type = (Textures::block_types)type;
         this->owner->v_blocks->blocks[this->l][this->c][this->layer] = (Textures::block_types)type;
+
+        if (type) {
+            this->block.setTexture(Textures::textures->at(type), false);
+
+            this->block.setScale(sf::Vector2f(BLOCK_X / (float)Textures::textures->at(type).getSize().x, BLOCK_Y / (float)Textures::textures->at(type).getSize().y));
+        }
     }
 
     void Block::hit() {
@@ -103,7 +109,7 @@ namespace env {
                 }
 
                 new_blocks->blocks[i][j][0] = (Textures::block_types)type;
-                new_blocks->blocks[i][j][1] = (Textures::block_types)type;
+                new_blocks->blocks[i][j][1] = Textures::AIR; //(Textures::block_types)type;
                 
             }
         }
