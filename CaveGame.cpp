@@ -67,7 +67,7 @@ public:
 
     std::vector < std::vector<env::Chunk*> > chunks_around;
     std::vector<Entity*> entities;
-    Player * player;
+    Player* player;
     sf::Vector2f presenting_pos_offset;
     sf::Vector2f window_center;
 
@@ -78,7 +78,7 @@ public:
     ElementsManager() {
         this->player = new Player();
 
-        this->player->pos = sf::Vector2f(CHUNK_DIM_COLUMNS * BLOCK_X / 2.f,  CHUNK_DIM_LINES * BLOCK_Y / 2.f);
+        this->player->pos = sf::Vector2f(CHUNK_DIM_COLUMNS * BLOCK_X / 2.f, CHUNK_DIM_LINES * BLOCK_Y / 2.f);
 
         this->chunk_gen();
 
@@ -98,23 +98,23 @@ public:
         if (pos.y < 0)
             y -= BLOCK_Y;
 
-        
-        xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X) ;
+
+        xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X);
         if (pos.x < 0 && x % (CHUNK_DIM_COLUMNS * BLOCK_X))
             xc -= 1;
-        col = (x - xc * (CHUNK_DIM_COLUMNS * BLOCK_X))/(float)BLOCK_X;
+        col = (x - xc * (CHUNK_DIM_COLUMNS * BLOCK_X)) / (float)BLOCK_X;
 
 
         yc = y / (CHUNK_DIM_LINES * BLOCK_Y);
         if (y < 0 && y % (CHUNK_DIM_LINES * BLOCK_Y))
             yc -= 1;
-        lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y))/ (float)BLOCK_Y;
+        lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y)) / (float)BLOCK_Y;
 
         int colc = xc - this->chunks_around[0][0]->universal_pos.x,
             linc = yc - this->chunks_around[0][0]->universal_pos.y;
 
 
-        int loffset, coloffset, l=lin, c;
+        int loffset, coloffset, l = lin, c;
 
         vector<sf::FloatRect>* collide_blocks = new vector<sf::FloatRect>();
 
@@ -126,13 +126,13 @@ public:
 
                 if (!(abs(linc + loffset) > 2 || abs(colc + coloffset) > 2 || linc + loffset < 0 || colc + coloffset < 0)) {
 
-                    env::Block * block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 0];
+                    env::Block* block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 0];
 
                     if (block->type >= env::Textures::GRASS) {
                         collide_blocks->push_back(sf::FloatRect(block->pos, sf::Vector2f(BLOCK_DIM)));
                     }
 
-                    
+
                 }
 
                 c++;
@@ -195,17 +195,67 @@ public:
         for (int i = 0; i < 3; i++) {
             this->chunks_around[i].resize(3); //three columns by three lines
             for (int j = 0; j < 3; j++) {
-                sf::Vector2i offset = {j-1, i - 1 };
+                sf::Vector2i offset = { j - 1, i - 1 };
 
                 chunks_around[i][j] = new env::Chunk(current_u_pos + offset);
             }
-            
+
         }
     }
 
-    //void chunk_loading();
+    void chunk_loading(){
+        float limitx_l = this->chunks_around[1][1]->pos.x, limitx_r = this->chunks_around[1][1]->pos.x + this->chunks_around[1][1]->dim.x;
+
+        float limity_u = this->chunks_around[1][1]->pos.y, limity_d = this->chunks_around[1][1]->pos.y + this->chunks_around[1][1]->dim.y;
+
+        if (this->player->pos.x < limitx_l) {
+            for (int line = 0; line < 3; line++) {
+                delete chunks_around[line][2];
+
+                chunks_around[line][2] = chunks_around[line][1];
+                chunks_around[line][1] = chunks_around[line][0];
+                chunks_around[line][0] = new env::Chunk(chunks_around[line][0]->universal_pos + sf::Vector2i(-1, 0));
+            }
+        }
+        else if (this->player->pos.x > limitx_r) {
+            for (int line = 0; line < 3; line++) {
+                delete chunks_around[line][0];
+
+                chunks_around[line][0] = chunks_around[line][1];
+                chunks_around[line][1] = chunks_around[line][2];
+                chunks_around[line][2] = new env::Chunk(chunks_around[line][2]->universal_pos + sf::Vector2i(1, 0));
+            }
+        }
+
+        /*
+        0 0  0 1  0 2
+        1 0  1 1  1 2
+        2 0  2 1  2 2
+        */
+
+        if (this->player->pos.y < limity_u) {
+            for (int column = 0; column < 3; column++) {
+                delete chunks_around[2][column];
+
+                chunks_around[2][column] = chunks_around[1][column];
+                chunks_around[1][column] = chunks_around[0][column];
+                chunks_around[0][column] = new env::Chunk(chunks_around[0][column]->universal_pos + sf::Vector2i(0, -1));
+            }
+        }
+        else if (this->player->pos.y > limity_d) {
+            for (int column = 0; column < 3; column++) {
+                delete chunks_around[0][column];
+
+                chunks_around[0][column] = chunks_around[1][column];
+                chunks_around[1][column] = chunks_around[2][column];
+                chunks_around[2][column] = new env::Chunk(chunks_around[2][column]->universal_pos + sf::Vector2i(0, 1));
+            }
+        }
+    }
 
     void render_all(sf::RenderWindow * window, float interval) {
+        this->chunk_loading();
+
         this->player->update_vel(interval);
 
         this->presenting_pos_offset = this->player->pos - sf::Vector2f(WINDOW_DIM) / 2.f;

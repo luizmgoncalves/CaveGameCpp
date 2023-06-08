@@ -54,6 +54,7 @@ void Entity::collision_algorithm(std::vector<sf::FloatRect>* blocks, float inter
             else {
                 new_rect.top = block.top - new_rect.height;
             }
+            this->vel.y = 0;
         }
     }
 
@@ -69,6 +70,7 @@ void Entity::collision_algorithm(std::vector<sf::FloatRect>* blocks, float inter
             else {
                 new_rect.left = block.left - new_rect.width;
             }
+            this->vel.x = 0;
         }
     }
 
@@ -157,19 +159,19 @@ void Player::update_vel_x(float interval) {
 
     this->vel.x *= 0.8;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
     {
         this->current_state.left = true;
         this->current_state.right = false;
 
-        this->vel.x = 1000;
+        this->vel.x = 400;
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
     {
         this->current_state.left = false;
         this->current_state.right = true;
 
-        this->vel.x = -1000;
+        this->vel.x = -400;
     }
 }
 
@@ -178,13 +180,16 @@ void Player::update_vel_y(float interval) {
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
-        this->pos.y = -100;
+        this->vel.y = -400;
     }
 }
 
 
 DropItem::DropItem(env::Textures::block_types type, sf::Vector2f pos) {
     this->pos = pos;
+
+    this->type = type;
+
     this->init(DROPED_ITEM_DIM, &env::Textures::textures->at(type));
 }
 
