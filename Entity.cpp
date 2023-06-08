@@ -174,7 +174,7 @@ void Player::update_vel_x(float interval) {
 }
 
 void Player::update_vel_y(float interval) {
-    this->pos.y += this->gravity * interval;
+    this->vel.y += this->gravity * interval;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {

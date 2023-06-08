@@ -8,11 +8,11 @@
 #define ENV_INITALIZED
 
 namespace env {
-#define CHUNK_DIM_LINES 20
-#define CHUNK_DIM_COLUMNS 30
+#define CHUNK_DIM_LINES 5
+#define CHUNK_DIM_COLUMNS 10
 
-#define BLOCK_X 40
-#define BLOCK_Y 40
+#define BLOCK_X 30
+#define BLOCK_Y 30
 #define BLOCK_DIM BLOCK_X, BLOCK_Y
 
     class Textures {

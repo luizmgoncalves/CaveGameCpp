@@ -12,7 +12,9 @@
 using namespace std;
 
 #define SCREEN_HEIGHT 600
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH 1000
+
+#define WINDOW_DIM SCREEN_WIDTH, SCREEN_HEIGHT
 
 sf::Font FONTE;
 
@@ -61,6 +63,8 @@ public:
         sf::Vector2f pos;
     } breaking_h;
 
+    sf::RectangleShape shower;
+
     std::vector < std::vector<env::Chunk*> > chunks_around;
     std::vector<Entity*> entities;
     Player * player;
@@ -74,10 +78,63 @@ public:
     ElementsManager() {
         this->player = new Player();
 
+        this->player->pos = sf::Vector2f(CHUNK_DIM_COLUMNS * BLOCK_X / 2.f,  CHUNK_DIM_LINES * BLOCK_Y / 2.f);
+
         this->chunk_gen();
 
     }
     //~ElementsManager();
+
+    vector<sf::FloatRect> * get_five_around(sf::Vector2f pos, sf::RenderWindow * window) {
+        int x, y, xc, yc, lin, col;
+
+        x = pos.x - (int)pos.x % BLOCK_X;
+        if (pos.x < 0)
+            x -= BLOCK_X;
+
+        y = pos.y - (int)pos.y % BLOCK_Y;
+        if (pos.y < 0)
+            y -= BLOCK_Y;
+
+        this->shower.setSize(sf::Vector2f(BLOCK_DIM));
+
+        this->shower.setPosition(sf::Vector2f(x, y) - this->presenting_pos_offset);
+
+        
+        xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X) ;
+        if (pos.x < 0 && x % (CHUNK_DIM_COLUMNS * BLOCK_X))
+            xc -= 1;
+        col = (x - xc * (CHUNK_DIM_COLUMNS * BLOCK_X))/(float)BLOCK_X;
+
+
+        yc = y / (CHUNK_DIM_LINES * BLOCK_Y);
+        if (y < 0 && y % (CHUNK_DIM_LINES * BLOCK_Y))
+            yc -= 1;
+        lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y))/ (float)BLOCK_Y;
+
+        int linc = xc - this->chunks_around[0][0]->universal_pos.x,
+            colc = yc - this->chunks_around[0][0]->universal_pos.y;
+
+        system("cls");
+
+        cout << "chunk x: " << xc << " " << yc << endl;
+        cout << "chunk offset: " << linc << " " << colc << endl;
+        cout << "lin: " << lin << " col: " << col << endl;
+
+        if (abs(linc) > 2 || abs(colc) > 2)
+            return 0;
+
+        if (this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->type) {
+            this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->change_type(env::Textures::AIR);
+            return 0;
+        }
+        this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->change_type(env::Textures::AIR);
+
+        return 0;
+        //for (int i=0; i < 5; i)
+
+    }
+
     void chunk_gen() {
         this->chunks_around = vector < vector<env::Chunk*> >(3);
         for (int i = 0; i < 3; i++) {
@@ -96,16 +153,24 @@ public:
     void render_all(sf::RenderWindow * window, float interval) {
         this->player->update_vel(interval);
 
+        this->presenting_pos_offset = this->player->pos - sf::Vector2f(WINDOW_DIM) / 2.f;
+
         for (vector<env::Chunk*> chunks_line : this->chunks_around) {
             for (env::Chunk* chunk : chunks_line) {
                 for (env::Block* block : chunk->blocks) {
-                    if(block->type)
-                        window->draw(block->block);
+                    if (!block->type)
+                        continue;
+
+                    block->block.setPosition(block->pos - presenting_pos_offset);
+                     window->draw(block->block);
                 }
             }
         }
 
+        this->player->shape.setPosition(this->player->pos - presenting_pos_offset);
+
         window->draw(this->player->shape);
+        window->draw(this->shower);
     }
 };
 
@@ -140,6 +205,14 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                float 
+                    wx = event.mouseButton.x / (float)window.getSize().x * SCREEN_WIDTH, 
+                    wy = event.mouseButton.y / (float)window.getSize().y * SCREEN_HEIGHT;
+
+                el_mngr.get_five_around(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
+            }
         }
 
 

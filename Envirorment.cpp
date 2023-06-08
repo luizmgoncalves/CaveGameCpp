@@ -90,8 +90,6 @@ namespace env {
 
                 float index = abs(EnvirormentGenerator::noise->Get(x/100.f, y/100.f)); //0 a 1
 
-                std::cout << "y_i: " << (int)y_i  << " y: " << y << std::endl;
-
                 if (y == (int)y_i) {
                     type = Textures::GRASS;
                 }
@@ -104,9 +102,9 @@ namespace env {
                     }
                 }
 
-                for (int layer = 0; layer < 2; layer++) {
-                    new_blocks->blocks[i][j][layer] = (Textures::block_types)type;
-                }
+                new_blocks->blocks[i][j][0] = (Textures::block_types)type;
+                new_blocks->blocks[i][j][1] = (Textures::block_types)type;
+                
             }
         }
 
