@@ -207,7 +207,7 @@ void Player::update_vel_x(float interval) {
         this->vel.x = -400;
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && this->current_state.walking) {
         this->vel.x *= 2.f;
         this->current_state.walking = false;
         this->current_state.running = true;

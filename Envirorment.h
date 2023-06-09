@@ -8,8 +8,8 @@
 #define ENV_INITALIZED
 
 namespace env {
-#define CHUNK_DIM_LINES 20
-#define CHUNK_DIM_COLUMNS 30
+#define CHUNK_DIM_LINES 17
+#define CHUNK_DIM_COLUMNS 25
 
 #define BLOCK_X 30
 #define BLOCK_Y 30

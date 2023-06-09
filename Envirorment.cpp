@@ -104,29 +104,56 @@ namespace env {
 
         for (int i = 0; i < CHUNK_DIM_LINES; i++) {
             for (int j = 0; j < CHUNK_DIM_COLUMNS; j++) {
-                int type = Textures::AIR;
+                int type1 = Textures::AIR;
+                
 
                 float y = pos_a.y * CHUNK_DIM_LINES  + i ,
                     x = pos_a.x * CHUNK_DIM_COLUMNS  + j;
 
-                float y_i = EnvirormentGenerator::noise->Get(x/100.f, 0.f) * 100.f + 3; //0 a 100
+                float y_i = EnvirormentGenerator::noise->Get(x/300.f, 0.f) * 100.f + 3; //0 a 100
 
                 float index = abs(EnvirormentGenerator::noise->Get(x/100.f, y/100.f)); //0 a 1
 
+                index += (rand() % 100)/100.f / 50.f;
+
+                int type2 = y >= (int)y_i ? Textures::DIRT : Textures::AIR;
+
                 if (y == (int)y_i) {
-                    type = Textures::GRASS;
+                    if(index > 0.02) 
+                        type1 = Textures::GRASS;
+
                 }
                 else if (y > y_i) {
-                    if (index < 0.30) {
-                        type = Textures::DIRT;
+                    if (y - y_i < 10) {
+                        if (index < 0.04) {
+                            type1 = Textures::AIR;
+                            type2 = index < 0.003 ? Textures::AIR : Textures::DIRT;
+                        }
+                        else if (index < 0.5) {
+                            type1 = Textures::DIRT;
+                        }
+                        else {
+                            type1 = Textures::STONE;
+                            type2 = Textures::STONE;
+                        }
                     }
                     else {
-                        type = Textures::STONE;
+                        if (index < 0.04) {
+                            type1 = Textures::AIR;
+                            type2 = index < 0.001 ? Textures::AIR : Textures::DIRT;
+                        }
+                        else if (index < 0.35) {
+                            type1 = Textures::DIRT;
+                        }
+                        else {
+                            type1 = Textures::STONE;
+                            type2 = Textures::STONE;
+                        }
                     }
                 }
 
-                new_blocks->blocks[i][j][0] = (Textures::block_types)type;
-                new_blocks->blocks[i][j][1] = (Textures::block_types)type;
+                new_blocks->blocks[i][j][0] = (Textures::block_types)type2;
+                new_blocks->blocks[i][j][1] = (Textures::block_types)type1; // surface
                 
             }
         }

@@ -178,16 +178,21 @@ public:
         if (abs(linc) > 2 || abs(colc) > 2)
             return 0;
 
-        env::Block* block_l0 = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1];
+        env::Block* block = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1];
 
-        if (block_l0->type) {
-            this->entities.push_back(new DropItem(block_l0->type, block_l0->pos));
+        if (block->type) {
+            this->entities.push_back(new DropItem(block->type, block->pos));
 
-            block_l0->change_type(env::Textures::AIR);
+            block->change_type(env::Textures::AIR);
             return 0;
         }
 
-        this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->change_type(env::Textures::AIR);
+        block = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0];
+
+        this->entities.push_back(new DropItem(block->type, block->pos));
+
+        block->change_type(env::Textures::AIR);
+
 
         return 0;
 
@@ -315,7 +320,7 @@ int main()
     FONTE.loadFromFile("arial.ttf");
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Cave Game");
 
-    window.setFramerateLimit(45);
+    window.setFramerateLimit(30);
 
 
     sf::Clock clock;
@@ -354,9 +359,9 @@ int main()
         // draw the objects
         window.clear();
 
-        window.draw(fps);
-
         el_mngr.render_all(&window, elapsed.asSeconds());
+
+        window.draw(fps);
         window.display();
 
     }
