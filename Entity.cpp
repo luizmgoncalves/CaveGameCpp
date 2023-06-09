@@ -24,12 +24,12 @@ void Entity::update_vel(float interval) {
 
     if (abs(this->vel.x) && abs(this->vel.x) * interval > this->MAX_X_VEL) {
         float sign = this->vel.x > 0 ? 1 : -1;
-        this->vel.x = this->MAX_X_VEL * sign;
+        this->vel.x = this->MAX_X_VEL * sign * interval;
     }
 
     if (abs(this->vel.y) && abs(this->vel.y) * interval > this->MAX_Y_VEL) {
         float sign = this->vel.y > 0 ? 1 : -1;
-        this->vel.y = this->MAX_Y_VEL * sign;
+        this->vel.y = this->MAX_Y_VEL * sign * interval;
     }
 }
 
@@ -95,12 +95,10 @@ Player::Player() {
         {"jumping", {{"j1", "j2"}, 3.f}}
     };
     for (auto it = image_types.begin(); it != image_types.end(); it++) {
-        std::string key = (*it).first;
+        std::string key = (*it).first; 
 
         this->textures[key + "r"].textures = new std::vector<sf::Texture *>();//right textures
         this->textures[key + "r"].time = image_types[key].time;
-
-        std::cout << key+"r" << ": " << this->textures[key + "r"].time << "\n";
 
         this->textures[key + "l"].textures = new std::vector<sf::Texture *>(); //left texture
         this->textures[key + "l"].time = image_types[key].time;
@@ -139,21 +137,20 @@ void Player::update_state(float interval) {
     this->frame_counter += interval;
 
     if (this->current_state.left) {
-        if (this->current_state.walking) {
-            int index = this->frame_counter / this->textures.at("walkingl").time;
-            std::cout << this->frame_counter << " - " << this->textures.at("walkingl").time << " - " << index << "\n";
+        if (this->current_state.jumping) {
+            int index = this->frame_counter / this->textures.at("jumpingl").time;
 
-            this->shape.setTexture(*this->textures.at("walkingl").textures->at(index % this->textures.at("walkingl").textures->size()), true);
+            this->shape.setTexture(*this->textures.at("jumpingl").textures->at(index % this->textures.at("jumpingl").textures->size()), true);
         }
         else if (this->current_state.running) {
             int index = this->frame_counter / this->textures.at("runningl").time;
 
             this->shape.setTexture(*this->textures.at("runningl").textures->at(index % this->textures.at("runningl").textures->size()), true);
         }
-        else if (this->current_state.jumping) {
-            int index = this->frame_counter / this->textures.at("jumpingl").time;
+        else if (this->current_state.walking) {
+            int index = this->frame_counter / this->textures.at("walkingl").time;
 
-            this->shape.setTexture(*this->textures.at("jumpingl").textures->at(index % this->textures.at("jumpingl").textures->size()), true);
+            this->shape.setTexture(*this->textures.at("walkingl").textures->at(index % this->textures.at("walkingl").textures->size()), true);
         }
         else {
             int index = this->frame_counter / this->textures.at("stoppedl").time;
@@ -162,20 +159,20 @@ void Player::update_state(float interval) {
         }
     }
     else if (this->current_state.right) {
-        if (this->current_state.walking) {
-            int index = this->frame_counter / this->textures.at("walkingr").time;
+        if (this->current_state.jumping) {
+            int index = this->frame_counter / this->textures.at("jumpingr").time;
 
-            this->shape.setTexture(*this->textures.at("walkingr").textures->at(index % this->textures.at("walkingr").textures->size()), true);
+            this->shape.setTexture(*this->textures.at("jumpingr").textures->at(index % this->textures.at("jumpingr").textures->size()), true);
         }
         else if (this->current_state.running) {
             int index = this->frame_counter / this->textures.at("runningr").time;
 
             this->shape.setTexture(*this->textures.at("runningr").textures->at(index % this->textures.at("runningr").textures->size()), true);
         }
-        else if (this->current_state.jumping) {
-            int index = this->frame_counter / this->textures.at("jumpingr").time;
+        else if (this->current_state.walking) {
+            int index = this->frame_counter / this->textures.at("walkingr").time;
 
-            this->shape.setTexture(*this->textures.at("jumpingr").textures->at(index % this->textures.at("jumpingr").textures->size()), true);
+            this->shape.setTexture(*this->textures.at("walkingr").textures->at(index % this->textures.at("walkingr").textures->size()), true);
         }
         else {
             int index = this->frame_counter / this->textures.at("stoppedr").time;

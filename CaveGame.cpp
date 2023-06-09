@@ -126,7 +126,7 @@ public:
 
                 if (!(abs(linc + loffset) > 2 || abs(colc + coloffset) > 2 || linc + loffset < 0 || colc + coloffset < 0)) {
 
-                    env::Block* block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 0];
+                    env::Block* block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 1];
 
                     if (block->type >= env::Textures::GRASS) {
                         collide_blocks->push_back(sf::FloatRect(block->pos, sf::Vector2f(BLOCK_DIM)));
@@ -167,26 +167,19 @@ public:
             yc -= 1;
         lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y)) / (float)BLOCK_Y;
 
-        int linc = xc - this->chunks_around[0][0]->universal_pos.x,
-            colc = yc - this->chunks_around[0][0]->universal_pos.y;
-
-        system("cls");
-
-        cout << "chunk x: " << xc << " " << yc << endl;
-        cout << "chunk offset: " << linc << " " << colc << endl;
-        cout << "lin: " << lin << " col: " << col << endl;
+        int colc = xc - this->chunks_around[0][0]->universal_pos.x,
+            linc = yc - this->chunks_around[0][0]->universal_pos.y;
 
         if (abs(linc) > 2 || abs(colc) > 2)
             return 0;
 
-        if (this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->type) {
-            this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->change_type(env::Textures::AIR);
+        if (this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->type) {
+            this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->change_type(env::Textures::AIR);
             return 0;
         }
-        this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->change_type(env::Textures::AIR);
+        this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->change_type(env::Textures::AIR);
 
         return 0;
-        //for (int i=0; i < 5; i)
 
     }
 
@@ -319,7 +312,7 @@ int main()
                     wx = event.mouseButton.x / (float)window.getSize().x * SCREEN_WIDTH, 
                     wy = event.mouseButton.y / (float)window.getSize().y * SCREEN_HEIGHT;
 
-                //el_mngr.break_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
+                el_mngr.break_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
             }
         }
 

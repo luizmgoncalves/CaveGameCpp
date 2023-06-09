@@ -8,18 +8,29 @@
 
 namespace env {
     std::vector<sf::Texture>* Textures::textures;
+    std::vector<sf::Texture>* Textures::textures_b;
 
     Textures::Textures() {
         textures = new std::vector<sf::Texture>(LAST);
+        textures_b = new std::vector<sf::Texture>(LAST);
+
 
         textures->at(LEAVE).loadFromFile("game_images/leave.png");
         textures->at(WOOD).loadFromFile("game_images/wood.png");
-
         //COLLIDABLE
-
         textures->at(GRASS).loadFromFile("game_images/grass.png");
         textures->at(DIRT).loadFromFile("game_images/dirt.png");
         textures->at(STONE).loadFromFile("game_images/stone.png");
+
+
+        //BACKGROUND TEXTURES
+        // |
+        // V
+        textures_b->at(LEAVE).loadFromFile("game_images/leave_b.png");
+        textures_b->at(WOOD).loadFromFile("game_images/wood_b.png");
+        textures_b->at(GRASS).loadFromFile("game_images/grass_b.png");
+        textures_b->at(DIRT).loadFromFile("game_images/dirt_b.png");
+        textures_b->at(STONE).loadFromFile("game_images/stone_b.png");
     }
 
 
@@ -32,7 +43,10 @@ namespace env {
         this->pos = pos;
 
         if (type) {
-            this->block.setTexture(Textures::textures->at(type), false);
+            if (this->layer)
+                this->block.setTexture(Textures::textures->at(type), false);
+            else
+                this->block.setTexture(Textures::textures_b->at(type), false);
 
             this->block.setScale(sf::Vector2f(BLOCK_X / (float)Textures::textures->at(type).getSize().x, BLOCK_Y / (float)Textures::textures->at(type).getSize().y));
         }
@@ -49,7 +63,10 @@ namespace env {
         this->owner->v_blocks->blocks[this->l][this->c][this->layer] = (Textures::block_types)type;
 
         if (type) {
-            this->block.setTexture(Textures::textures->at(type), false);
+            if(this->layer)
+                this->block.setTexture(Textures::textures->at(type), false);
+            else
+                this->block.setTexture(Textures::textures_b->at(type), false);
 
             this->block.setScale(sf::Vector2f(BLOCK_X / (float)Textures::textures->at(type).getSize().x, BLOCK_Y / (float)Textures::textures->at(type).getSize().y));
         }
@@ -109,7 +126,7 @@ namespace env {
                 }
 
                 new_blocks->blocks[i][j][0] = (Textures::block_types)type;
-                new_blocks->blocks[i][j][1] = Textures::AIR; //(Textures::block_types)type;
+                new_blocks->blocks[i][j][1] = (Textures::block_types)type;
                 
             }
         }

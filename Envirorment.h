@@ -27,6 +27,7 @@ namespace env {
             LAST
         };
         static std::vector<sf::Texture>* textures;
+        static std::vector<sf::Texture>* textures_b;
         Textures();
     };
 
