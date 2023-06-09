@@ -66,7 +66,7 @@ public:
     sf::RectangleShape shower;
 
     std::vector < std::vector<env::Chunk*> > chunks_around;
-    std::vector<Entity*> entities;
+    std::vector<DropItem*> entities;
     Player* player;
     sf::Vector2f presenting_pos_offset;
     sf::Vector2f window_center;
@@ -173,10 +173,15 @@ public:
         if (abs(linc) > 2 || abs(colc) > 2)
             return 0;
 
-        if (this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->type) {
-            this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1]->change_type(env::Textures::AIR);
+        env::Block* block_l0 = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1];
+
+        if (block_l0->type) {
+            this->entities.push_back(new DropItem(block_l0->type, block_l0->pos));
+
+            block_l0->change_type(env::Textures::AIR);
             return 0;
         }
+
         this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0]->change_type(env::Textures::AIR);
 
         return 0;
@@ -252,9 +257,18 @@ public:
         this->player->update_vel(interval);
         this->player->update_state(interval);
 
+        for (DropItem* entity : this->entities) {
+            entity->update_vel(interval);
+            entity->atract(player->pos);
+        }
+
         this->presenting_pos_offset = this->player->pos - sf::Vector2f(WINDOW_DIM) / 2.f;
 
         this->player->collision_algorithm(this->get_five_around(this->player->pos), interval);
+
+        for (DropItem* entity : this->entities) {
+            entity->collision_algorithm(this->get_five_around(entity->pos), interval);
+        }
 
         for (vector<env::Chunk*> chunks_line : this->chunks_around) {
             for (env::Chunk* chunk : chunks_line) {
@@ -269,8 +283,13 @@ public:
         }
 
         this->player->shape.setPosition(this->player->pos - presenting_pos_offset);
-
         window->draw(this->player->shape);
+
+        for (DropItem* entity : this->entities) {
+            entity->shape.setPosition(entity->pos - presenting_pos_offset);
+            window->draw(entity->shape);
+        }
+        
         window->draw(this->shower);
     }
 };

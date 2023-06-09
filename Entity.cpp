@@ -12,7 +12,7 @@ void Entity::init(int w, int h, sf::Texture* text) {
 
     this->dim = sf::Vector2f( w, h );
 
-    this->shape.setScale(sf::Vector2f( w / text->getSize().x, h / text->getSize().y ));
+    this->shape.setScale(sf::Vector2f( w / (float)text->getSize().x, h / (float)text->getSize().y ));
     this->gravity = 1000;
     def_max_vel();
 }
@@ -233,6 +233,13 @@ DropItem::DropItem(env::Textures::block_types type, sf::Vector2f pos) {
 
     this->type = type;
 
+    //srand(time(0));
+
+    this->vel.x = rand() % 200 - 100;
+    this->vel.y = - rand() % 100;
+
+    this->vel *= 6.f;
+
     this->init(DROPED_ITEM_DIM, &env::Textures::textures->at(type));
 }
 
@@ -244,8 +251,6 @@ void DropItem::atract(sf::Vector2f point) {
 
     sf::Vector2f force = { 1, 1 };
 
-    force *= 10.f; //factor
-
     if (difx) {
         force.x = difx > 0 ? 1 : -1;
     }
@@ -254,13 +259,13 @@ void DropItem::atract(sf::Vector2f point) {
         force.y = dify > 0 ? 1 : -1;
     }
 
-    force *= lenght;
+    force *= lenght * 0.15f;
 
     this->vel += force;
 }
 
 void DropItem::update_vel_x(float interval) {
-    this->vel.x *= 0.8;
+    this->vel.x *= 0.9 + (rand()%10 / 100.f);
 }
 
 void DropItem::update_vel_y(float interval) {
