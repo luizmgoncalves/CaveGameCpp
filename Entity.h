@@ -60,14 +60,21 @@ public:
 class Player : public Entity {
 public:
 
-    std::unordered_map<std::string, std::vector<sf::Texture *>*> textures;
+    struct sprites {
+        std::vector<sf::Texture*> * textures;
+        float time;
+    };
+
+    std::unordered_map<std::string, struct sprites> textures;
+
+    float frame_counter;
 
 
     Player();
 
     void collided_down();
 
-    void update_state();
+    void update_state(float interval);
 
     void update_vel_x(float interval);
 

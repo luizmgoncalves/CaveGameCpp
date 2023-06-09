@@ -257,6 +257,7 @@ public:
         this->chunk_loading();
 
         this->player->update_vel(interval);
+        this->player->update_state(interval);
 
         this->presenting_pos_offset = this->player->pos - sf::Vector2f(WINDOW_DIM) / 2.f;
 
