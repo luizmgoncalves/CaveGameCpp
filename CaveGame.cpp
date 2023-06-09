@@ -131,7 +131,9 @@ public:
 
                 if (!(abs(linc + loffset) > 2 || abs(colc + coloffset) > 2 || linc + loffset < 0 || colc + coloffset < 0)) {
 
-                    env::Block* block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES) * CHUNK_DIM_COLUMNS * 2 + (c % CHUNK_DIM_COLUMNS) * 2 + 1];
+                    env::Block* block = this->chunks_around[linc + loffset][colc + coloffset]->blocks[(l % CHUNK_DIM_LINES)][(c % CHUNK_DIM_COLUMNS)][1];
+
+                    //block->change_type(env::Textures::WOOD);
 
                     if (block->type >= env::Textures::GRASS) {
                         collide_blocks->push_back(sf::FloatRect(block->pos, sf::Vector2f(BLOCK_DIM)));
@@ -178,7 +180,7 @@ public:
         if (abs(linc) > 2 || abs(colc) > 2)
             return 0;
 
-        env::Block* block = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 1];
+        env::Block* block = this->chunks_around[linc][colc]->blocks[lin][col][1];
 
         if (block->type) {
             this->entities.push_back(new DropItem(block->type, block->pos));
@@ -187,7 +189,7 @@ public:
             return 0;
         }
 
-        block = this->chunks_around[linc][colc]->blocks[lin * CHUNK_DIM_COLUMNS * 2 + col * 2 + 0];
+        block = this->chunks_around[linc][colc]->blocks[lin][col][0];
 
         this->entities.push_back(new DropItem(block->type, block->pos));
 
@@ -289,12 +291,24 @@ public:
 
         for (vector<env::Chunk*> chunks_line : this->chunks_around) {
             for (env::Chunk* chunk : chunks_line) {
-                for (env::Block* block : chunk->blocks) {
-                    if (!block->type)
-                        continue;
+                for (int l = 0; l < CHUNK_DIM_LINES; l++) {
+                    for (int c = 0; c < CHUNK_DIM_COLUMNS; c++) {
+                        env::Block
+                            * b1 = chunk->blocks[l][c][1], 
+                            * b2 = chunk->blocks[l][c][0];
 
-                    block->block.setPosition(block->pos - presenting_pos_offset);
-                     window->draw(block->block);
+                        if (!b1->type) { 
+                            // it render background blocks only if the surface block does not exists
+
+                            b2->block.setPosition(b2->pos - presenting_pos_offset);
+                            window->draw(b2->block);
+                            continue;
+                        }
+                        
+
+                        b1->block.setPosition(b1->pos - presenting_pos_offset);
+                        window->draw(b1->block);
+                    }
                 }
             }
         }

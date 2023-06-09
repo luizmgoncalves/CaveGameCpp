@@ -186,7 +186,7 @@ namespace env {
         for (int i = 0; i < CHUNK_DIM_LINES; i++) {
             for (int j = 0; j < CHUNK_DIM_COLUMNS; j++) {
                 for (int layer = 0; layer < 2; layer++) {
-                    delete this->blocks[i * CHUNK_DIM_COLUMNS * 2 + j * 2 + layer];
+                    delete this->blocks[i][j][layer];
                 }
             }
         }
@@ -198,7 +198,7 @@ namespace env {
                 for (int layer = 0; layer < 2; layer++) {
                     sf::Vector2f upos = this->pos + sf::Vector2f(j * BLOCK_X, i * BLOCK_Y);
 
-                    this->blocks[i * CHUNK_DIM_COLUMNS * 2 + j * 2 + layer] = new Block(this, this->v_blocks->blocks[i][j][layer], upos, i, j, layer);
+                    this->blocks[i][j][layer] = new Block(this, this->v_blocks->blocks[i][j][layer], upos, i, j, layer);
                 }
             }
         }

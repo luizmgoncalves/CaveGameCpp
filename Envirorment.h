@@ -78,7 +78,7 @@ namespace env {
     class Chunk {
     public:
         struct v_blocks* v_blocks;
-        Block* blocks[CHUNK_DIM_LINES * CHUNK_DIM_COLUMNS * 2];
+        Block* blocks[CHUNK_DIM_LINES][CHUNK_DIM_COLUMNS][2];
         sf::Vector2i universal_pos;
         sf::Vector2f pos;
         sf::Vector2f dim;
