@@ -12,11 +12,16 @@
 using namespace std;
 
 #define SCREEN_HEIGHT 800
-#define SCREEN_WIDTH 1200
+#define SCREEN_WIDTH 1500
 
 #define WINDOW_DIM SCREEN_WIDTH, SCREEN_HEIGHT
 
 sf::Font FONTE;
+
+float distance(sf::Vector2f pos1, sf::Vector2f pos2) {
+    float dx = pos1.x - pos2.x, dy = pos1.y - pos2.y;
+    return hypot(dx, dy);
+}
 
 
 class Inventory {
@@ -266,8 +271,15 @@ public:
 
         this->player->collision_algorithm(this->get_five_around(this->player->pos), interval);
 
-        for (DropItem* entity : this->entities) {
+        for (int i = 0; i < this->entities.size(); i++) {
+            DropItem* entity = this->entities[i];
+
             entity->collision_algorithm(this->get_five_around(entity->pos), interval);
+
+            if (distance(entity->pos, this->player->pos) < 40) {
+                this->entities.erase(this->entities.begin() + i);
+                i--;
+            }
         }
 
         for (vector<env::Chunk*> chunks_line : this->chunks_around) {

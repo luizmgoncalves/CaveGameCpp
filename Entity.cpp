@@ -24,12 +24,12 @@ void Entity::update_vel(float interval) {
 
     if (abs(this->vel.x) && abs(this->vel.x) * interval > this->MAX_X_VEL) {
         float sign = this->vel.x > 0 ? 1 : -1;
-        this->vel.x = this->MAX_X_VEL * sign * interval;
+        this->vel.x = this->MAX_X_VEL * sign / interval;
     }
 
     if (abs(this->vel.y) && abs(this->vel.y) * interval > this->MAX_Y_VEL) {
         float sign = this->vel.y > 0 ? 1 : -1;
-        this->vel.y = this->MAX_Y_VEL * sign * interval;
+        this->vel.y = this->MAX_Y_VEL * sign / interval;
     }
 }
 
@@ -158,7 +158,7 @@ void Player::update_state(float interval) {
             this->shape.setTexture(*this->textures.at("stoppedl").textures->at(index % this->textures.at("stoppedl").textures->size()), true);
         }
     }
-    else if (this->current_state.right) {
+    else {
         if (this->current_state.jumping) {
             int index = this->frame_counter / this->textures.at("jumpingr").time;
 
