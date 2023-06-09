@@ -87,7 +87,43 @@ namespace env {
 
     }
 
-    void EnvirormentGenerator::gen_tree(int line, int col, struct v_blocks*) {
+    void EnvirormentGenerator::gen_tree(int line, int col, struct v_blocks* blocks) {
+        int tree_form[5][5] = {
+            0, 1, 1, 1, 0,
+            1, 1, 1, 1, 1,
+            1, 1, 2, 1, 1,
+            0, 0, 2, 0, 0,
+            0, 0, 2, 0, 0,
+        };
+
+        int height = rand() % 5;
+
+        int l, c;
+
+        if (line - 5 - height < 0)
+            return;
+        if (col - 2 < 0 || col + 2 >= CHUNK_DIM_COLUMNS)
+            return;
+
+        
+        for (int i = 0; i < 5 + height; i++) {
+            for (int j = 0; j < 5; j++) {
+                l = line - 5 - height + i;
+                c = col - 2 + j;
+
+                if (i >= 5) {
+                    if(c == col)
+                        blocks->blocks[l][c][1] = Textures::WOOD;
+
+                }else if (tree_form[i][j]) {
+                    blocks->blocks[l][c][1] = (Textures::block_types) tree_form[i][j];
+                }
+                
+                    
+            }
+        }
+
+
         //pass
     }
 
@@ -96,11 +132,14 @@ namespace env {
         pos.point.x = pos_a.x;
         pos.point.y = pos_a.y;
 
-        if (EnvirormentGenerator::all_blocks.count(pos.hashable)) { // check if these blocks already exists
+        if (EnvirormentGenerator::all_blocks.count(pos.hashable) && EnvirormentGenerator::all_blocks.at(pos.hashable)->tottaly_generated) { 
+            // check if these blocks already exists and if it is tottaly generated
             return EnvirormentGenerator::all_blocks.at(pos.hashable);
         }
 
         struct v_blocks* new_blocks = new struct v_blocks;
+
+        new_blocks->pos = pos;
 
         for (int i = 0; i < CHUNK_DIM_LINES; i++) {
             for (int j = 0; j < CHUNK_DIM_COLUMNS; j++) {
@@ -118,7 +157,14 @@ namespace env {
 
                 int type2 = y >= (int)y_i ? Textures::DIRT : Textures::AIR;
 
+                
+
                 if (y == (int)y_i) {
+                    bool tree_chance = rand() % 100 > 90; // chance of a tree spawn
+
+                    if (tree_chance)
+                        EnvirormentGenerator::gen_tree(i , j, new_blocks);
+
                     if(index > 0.02) 
                         type1 = Textures::GRASS;
 

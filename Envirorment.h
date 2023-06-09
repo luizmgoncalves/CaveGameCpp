@@ -31,17 +31,17 @@ namespace env {
         Textures();
     };
 
-    struct v_blocks {
-        bool tottaly_generated;
-        Textures::block_types blocks[CHUNK_DIM_LINES][CHUNK_DIM_COLUMNS][2];
-    };
-
-
     union Point {
         size_t hashable;
         struct {
             int x, y;
         } point;
+    };
+
+    struct v_blocks {
+        Point pos;
+        bool tottaly_generated;
+        Textures::block_types blocks[CHUNK_DIM_LINES][CHUNK_DIM_COLUMNS][2];
     };
 
     class Chunk;
