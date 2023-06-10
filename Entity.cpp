@@ -182,10 +182,11 @@ void Player::update_state(float interval) {
     }
 }
 
+#define WALKING_VEL 400
 
 void Player::update_vel_x(float interval) {
 
-    this->vel.x *= 0.8;
+    
     this->current_state.walking = false;
     this->current_state.running = false;
 
@@ -195,8 +196,12 @@ void Player::update_vel_x(float interval) {
         this->current_state.left = false;
         this->current_state.right = true;
         this->current_state.walking = true;
+        
+        this->vel.x += 30;
+        if (this->vel.x > WALKING_VEL) {
+            this->vel.x = WALKING_VEL;
+        }
 
-        this->vel.x = 400;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
     {
@@ -204,7 +209,13 @@ void Player::update_vel_x(float interval) {
         this->current_state.right = false;
         this->current_state.walking = true;
 
-        this->vel.x = -400;
+        this->vel.x -= 30 ;
+        if (this->vel.x < -WALKING_VEL) {
+            this->vel.x = -WALKING_VEL;
+        }
+    }
+    else {
+        this->vel.x *= 0.8;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && this->current_state.walking) {
@@ -218,9 +229,9 @@ void Player::update_vel_x(float interval) {
 void Player::update_vel_y(float interval) {
     this->vel.y += this->gravity * interval;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !this->current_state.jumping)
     {
-        this->vel.y = -400;
+        this->vel.y = -350;
         this->current_state.jumping = true;
         this->current_state.running = false;
         this->current_state.walking = false;

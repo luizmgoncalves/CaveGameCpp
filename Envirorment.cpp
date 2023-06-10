@@ -83,7 +83,7 @@ namespace env {
 
 
     EnvirormentGenerator::EnvirormentGenerator() {
-        noise = new Perlin(1, 3, 1.f, 0);
+        noise = new Perlin(1, 3, 1.f, 1);
 
     }
 
@@ -160,7 +160,7 @@ namespace env {
                 
 
                 if (y == (int)y_i) {
-                    bool tree_chance = rand() % 100 > 90; // chance of a tree spawn
+                    bool tree_chance = rand() % 100 > 85; // chance of a tree spawn
 
                     if (tree_chance)
                         EnvirormentGenerator::gen_tree(i , j, new_blocks);
@@ -184,7 +184,7 @@ namespace env {
                         }
                     }
                     else {
-                        if (index < 0.04) {
+                        if (index < 0.06) {
                             type1 = Textures::AIR;
                             type2 = index < 0.001 ? Textures::AIR : Textures::DIRT;
                         }

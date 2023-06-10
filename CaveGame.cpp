@@ -344,6 +344,14 @@ int main()
     fps.setFont(FONTE);
     fps.setCharacterSize(20);
 
+    sf::Texture BG_IMAGET;
+
+    sf::Sprite BG_IMAGE;
+
+    BG_IMAGET.loadFromFile("game_images/bg.jpg");
+    BG_IMAGE.setPosition({ 0, 0 });
+    BG_IMAGE.setTexture(BG_IMAGET, true);
+
 
     ElementsManager el_mngr = ElementsManager();
 
@@ -374,6 +382,8 @@ int main()
 
         // draw the objects
         window.clear();
+
+        window.draw(BG_IMAGE);
 
         el_mngr.render_all(&window, elapsed.asSeconds());
 
