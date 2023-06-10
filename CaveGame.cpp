@@ -299,6 +299,8 @@ public:
 
                         if (!b1->type) { 
                             // it render background blocks only if the surface block does not exists
+                            if (!b2->type)
+                                continue;
 
                             b2->block.setPosition(b2->pos - presenting_pos_offset);
                             window->draw(b2->block);
