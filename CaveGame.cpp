@@ -91,7 +91,7 @@ public:
     //~ElementsManager();
 
     vector<sf::FloatRect>* get_five_around(sf::Vector2f pos) {
-        pos -= sf::Vector2f(BLOCK_X, BLOCK_Y) * 1.9f;
+        pos -= sf::Vector2f(BLOCK_X, BLOCK_Y) * 1.f;
 
         int x, y, xc, yc, lin, col;
 
@@ -123,9 +123,9 @@ public:
 
         vector<sf::FloatRect>* collide_blocks = new vector<sf::FloatRect>();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             c = col;
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < 7; j++) {
                 loffset = l / CHUNK_DIM_LINES;
                 coloffset = c / CHUNK_DIM_COLUMNS;
 

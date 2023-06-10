@@ -11,8 +11,8 @@ namespace env {
 #define CHUNK_DIM_LINES 20
 #define CHUNK_DIM_COLUMNS 30
 
-#define BLOCK_X 25
-#define BLOCK_Y 25
+#define BLOCK_X 20
+#define BLOCK_Y 20
 #define BLOCK_DIM BLOCK_X, BLOCK_Y
 
     class Textures {

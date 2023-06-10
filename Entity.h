@@ -49,7 +49,7 @@ public:
 
 #define PLAYER_DIM_Y 34
 
-#define PLAYER_DIM 30, 34
+#define PLAYER_DIM 30, 40
 
 #define PLAYER_RUNNING_DIM_X 36
 
