@@ -48,6 +48,38 @@ public:
         this->item.setPosition(this->arrow.getPosition() + sf::Vector2f(this->arrowt.getSize().x, 0));
     }
 
+    void scrool_up() {
+        this->curr_item++;
+        if (curr_item >= env::Textures::LAST) {
+            curr_item = 1;
+        }
+        this->change_item();
+    }
+
+    void scrool_down() {
+        this->curr_item--;
+        if (curr_item <= 0) {
+            curr_item = env::Textures::LAST - 1;
+        }
+        this->change_item();
+    }
+
+    void add(env::Textures::block_types type) {
+        this->items[type]++;
+    }
+
+    bool rem() {
+        if (this->items[curr_item]) {
+            this->items[curr_item]--;
+            return true;
+        }
+        return false;
+    }
+
+    void change_item() {
+        this->item.setTexture(env::Textures::textures->at(curr_item), false);
+    }
+
     void draw(sf::RenderWindow* window) {
         window->draw(this->arrow);
         window->draw(this->item);
@@ -151,7 +183,7 @@ public:
 
     }
 
-    bool break_block(sf::Vector2f pos, sf::RenderWindow* window) {
+    bool break_block(sf::Vector2f pos) {
         int x, y, xc, yc, lin, col;
 
         x = pos.x - (int)pos.x % BLOCK_X;
@@ -197,6 +229,56 @@ public:
 
 
         return 0;
+
+    }
+
+    void put_block(sf::Vector2f pos) {
+        int x, y, xc, yc, lin, col;
+
+        x = pos.x - (int)pos.x % BLOCK_X;
+        if (pos.x < 0)
+            x -= BLOCK_X;
+
+        y = pos.y - (int)pos.y % BLOCK_Y;
+        if (pos.y < 0)
+            y -= BLOCK_Y;
+
+
+        xc = x / (CHUNK_DIM_COLUMNS * BLOCK_X);
+        if (pos.x < 0 && x % (CHUNK_DIM_COLUMNS * BLOCK_X))
+            xc -= 1;
+        col = (x - xc * (CHUNK_DIM_COLUMNS * BLOCK_X)) / (float)BLOCK_X;
+
+
+        yc = y / (CHUNK_DIM_LINES * BLOCK_Y);
+        if (y < 0 && y % (CHUNK_DIM_LINES * BLOCK_Y))
+            yc -= 1;
+        lin = (y - yc * (CHUNK_DIM_LINES * BLOCK_Y)) / (float)BLOCK_Y;
+
+        int colc = xc - this->chunks_around[0][0]->universal_pos.x,
+            linc = yc - this->chunks_around[0][0]->universal_pos.y;
+
+        if (abs(linc) > 2 || abs(colc) > 2)
+            return ;
+
+        env::Block 
+            * block = this->chunks_around[linc][colc]->blocks[lin][col][1],
+            * block2 = this->chunks_around[linc][colc]->blocks[lin][col][0];
+
+        if (block->type) {
+            return;
+        }
+
+        if (block2->type){
+            if(this->inventory.rem())
+                block->change_type(this->inventory.curr_item);
+            return;
+        }
+
+        if (this->inventory.rem())
+            block2->change_type(this->inventory.curr_item);
+
+
 
     }
 
@@ -285,6 +367,7 @@ public:
 
             if (distance(entity->pos, this->player->pos) < 40) {
                 this->entities.erase(this->entities.begin() + i);
+                this->inventory.add(entity->type);
                 i--;
             }
         }
@@ -322,8 +405,8 @@ public:
             entity->shape.setPosition(entity->pos - presenting_pos_offset);
             window->draw(entity->shape);
         }
-        
-        window->draw(this->shower);
+
+        this->inventory.draw(window);
     }
 };
 
@@ -367,12 +450,23 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
 
+            if (event.type == sf::Event::MouseWheelMoved) {
+                if (event.mouseWheel.delta > 0)
+                    el_mngr.inventory.scrool_up();
+                else
+                    el_mngr.inventory.scrool_down();
+            }
+
             if (event.type == sf::Event::MouseButtonPressed) {
                 float 
                     wx = event.mouseButton.x / (float)window.getSize().x * SCREEN_WIDTH, 
                     wy = event.mouseButton.y / (float)window.getSize().y * SCREEN_HEIGHT;
 
-                el_mngr.break_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset, &window);
+                if(event.mouseButton.button == 0)
+                    el_mngr.break_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset);
+                else if (event.mouseButton.button == 1)
+                    el_mngr.put_block(sf::Vector2f(wx, wy) + el_mngr.presenting_pos_offset);
+
             }
         }
 

@@ -9,7 +9,7 @@
 
 namespace env {
 #define CHUNK_DIM_LINES 20
-#define CHUNK_DIM_COLUMNS 30
+#define CHUNK_DIM_COLUMNS 38
 
 #define BLOCK_X 20
 #define BLOCK_Y 20
